@@ -20,6 +20,19 @@ class Aduan extends Model
         'aduan',
         'file',
     ];
+    public function detail()
+    {
+        return $this->hasMany(DetailAduan::class, 'kode_aduan', 'kode_aduan');
+    }
+
+    /**
+     * Relasi ke status terakhir (yang paling baru)
+     */
+    public function latestDetail()
+    {
+        return $this->hasOne(DetailAduan::class, 'kode_aduan', 'kode_aduan')->latestOfMany();
+    }
+    
 }
 
 

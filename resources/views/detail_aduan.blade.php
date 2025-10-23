@@ -6,13 +6,18 @@
     <p class="text-gray-500 mb-6">
         Dikirim pada:
         <span class="font-semibold text-gray-700">
-            {{ \Carbon\Carbon::parse($aduan->tanggal ?? now())->translatedFormat('d F Y') }}
+            {{ \Carbon\Carbon::parse($aduan->created_at ?? now())->translatedFormat('d F Y') }}
+        </span>
+<br>
+        Kode Aduan:
+        <span class="font-semibold text-gray-700">
+           {{ $aduan->kode_aduan ?? 'Tidak ada kode' }}
         </span>
     </p>
 
     {{-- Gambar --}}
-    @if (!empty($aduan->foto))
-        <img src="{{ asset('storage/' . $aduan->foto) }}"
+    @if (!empty($aduan->file))
+        <img src="{{ asset('storage/' . $aduan->file) }}"
              alt="Foto Aduan"
              class="w-full rounded-lg mb-6 shadow-sm">
     @else
@@ -21,7 +26,10 @@
         </div>
     @endif
 
-
+    {{-- Isi Aduan --}}
+    <p class="leading-relaxed text-gray-700 mb-6">
+        {{ $aduan->aduan ?? 'Tidak ada deskripsi aduan.' }}
+    </p>
 
     {{-- Informasi Pelapor --}}
     <div class="mt-8 border-t pt-5">
@@ -29,7 +37,7 @@
         <ul class="text-gray-700 space-y-1">
             <li><strong>Nama:</strong> {{ $aduan->nama ?? '-' }}</li>
             <li><strong>Alamat:</strong> {{ $aduan->alamat ?? '-' }}</li>
-            {{-- <li><strong>Kontak:</strong> {{ $aduan->telfon ?? '-' }}</li> --}}
+            <li><strong>Kontak:</strong> {{ $aduan->telfon ?? '-' }}</li>
         </ul>
     </div>
 
@@ -50,7 +58,7 @@
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Status Laporan</h3>
 
         @php
-            $status = strtolower($aduan->status ?? 'ditinjau');
+            $status = strtolower($aduan->latestDetail->status ?? 'ditinjau');
         @endphp
 
         <div class="flex items-center justify-between relative mb-6">
@@ -59,7 +67,7 @@
             {{-- Step 1 --}}
             <div class="relative z-10 flex flex-col items-center">
                 <div class="w-8 h-8 flex items-center justify-center rounded-full 
-                    {{ $status == 'ditinjau' || $status == 'dikerjakan' || $status == 'selesai' ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700' }}">
+                    {{ in_array($status, ['ditinjau','dikerjakan','selesai']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700' }}">
                     1
                 </div>
                 <p class="mt-2 text-sm font-semibold {{ $status == 'ditinjau' ? 'text-blue-600' : 'text-gray-700' }}">Sedang Ditinjau</p>
@@ -68,7 +76,7 @@
             {{-- Step 2 --}}
             <div class="relative z-10 flex flex-col items-center">
                 <div class="w-8 h-8 flex items-center justify-center rounded-full 
-                    {{ $status == 'dikerjakan' || $status == 'selesai' ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700' }}">
+                    {{ in_array($status, ['dikerjakan','selesai']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700' }}">
                     2
                 </div>
                 <p class="mt-2 text-sm {{ $status == 'dikerjakan' ? 'text-blue-600 font-semibold' : 'text-gray-700' }}">Sementara Dikerjakan</p>
@@ -86,7 +94,7 @@
 
         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
             <p class="text-blue-700">
-                <strong>Status saat ini:</strong> {{ ucfirst($aduan->status ?? 'Sedang Ditinjau') }}
+                <strong>Status saat ini:</strong> {{ ucfirst($aduan->latestDetail->status ?? 'Sedang Ditinjau') }}
             </p>
         </div>
     </div>

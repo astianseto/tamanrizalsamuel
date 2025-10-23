@@ -4,52 +4,82 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Aduan;
+use App\Models\DetailAduan;
 
 class AduanController extends Controller
 {
     public function index()
     {
-        // Tampilkan daftar aduan
-        // $aduan = Aduan::latest()->get();
-        // return view('aduan', compact('aduan'));
-
-        $aduan = \App\Models\Aduan::latest()->paginate(6);
+        $aduan = Aduan::latest()->paginate(6);
         return view('aduan', compact('aduan'));
-    
     }
 
     public function create()
     {
-        // Tampilkan form tambah aduan
         return view('form_aduan');
     }
 
     public function store(Request $request)
     {
-        // Simpan data aduan ke database
-        $validated = $request->validate([
-            'nik' => 'required',
-            'nama' => 'required',
-            'telfon' => 'required',
-            'aduan' => 'required',
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+$validated = $request->validate([
+            'nik' => 'required|string|max:20',
+            'nama' => 'required|string|max:100',
+            'alamat' => 'required|string|max:255',
+            'telfon' => 'required|string|max:20',
+            'aduan' => 'required|string',
+            'file' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        if ($request->hasFile('file')) {
-            $validated['file'] = $request->file('file')->store('uploads', 'public');
+        // ✅ Generate kode_aduan unik
+        $tanggal = now()->format('Ymd');
+        $prefix = 'LSR' . $tanggal . '-';
+
+        $lastAduan = Aduan::where('kode_aduan', 'like', $prefix . '%')
+            ->orderBy('kode_aduan', 'desc')
+            ->first();
+
+        if ($lastAduan) {
+            $lastNumber = (int) substr($lastAduan->kode_aduan, -3);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
         }
 
-        Aduan::create($validated);
+        $kode_aduan = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-        return redirect()->route('aduan.index')->with('success', 'Aduan berhasil dikirim!');
+        // ✅ Upload file jika ada
+        $path = null;
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('aduan', 'public');
+        }
+
+        // ✅ Simpan ke database
+        Aduan::create([
+            'kode_aduan' => $kode_aduan,
+            'nik' => $validated['nik'],
+            'nama' => $validated['nama'],
+            'alamat' => $validated['alamat'],
+            'telfon' => $validated['telfon'],
+            'aduan' => $validated['aduan'],
+            'file' => $path,
+        ]);
+        
+        DetailAduan::create([
+            'kode_aduan' => $kode_aduan,
+            'status' => 'sedang ditinjau',
+        ]);
+
+
+        return redirect()->back()->with('success', "Laporan berhasil dikirim! Kode Aduan Anda: $kode_aduan");
     }
 
-    public function show($id)
+    public function show($kode_aduan)
     {
-        // Tampilkan detail aduan
-        $aduan = Aduan::where('kode_aduan', $id)->firstOrFail();
+        // Ambil aduan berdasarkan kode_aduan, beserta status terakhir dari tabel detail_aduan
+        $aduan = Aduan::where('kode_aduan', $kode_aduan)
+            ->with('latestDetail') // relasi ke status terbaru
+            ->firstOrFail();
+
         return view('detail_aduan', compact('aduan'));
     }
-
-
 }
