@@ -6,7 +6,33 @@
         Ikuti perkembangan aduan dan laporan masyarakat yang ditangani Pemerintah Kabupaten Sigi
     </p>
 
-    <!-- Grid Aduan -->
+    <!-- 🔍 Box Pencarian Kode Aduan -->
+    <div class="rounded-2xl p-6 mb-10">
+      
+        <form method="GET" action="{{ route('aduan.cari') }}" class="flex flex-col md:flex-row items-center justify-center gap-3">
+            <input
+                type="text"
+                name="kode_aduan"
+                placeholder="Masukkan Nomor Aduan untuk melihat perkembangan aduan Anda"
+                required
+                class="w-full md:w-2/3 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+            <button
+                type="submit"
+                class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition"
+            >
+                Cari
+            </button>
+        </form>
+
+        @if(session('not_found'))
+            <div class="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg text-red-700">
+                Kode aduan tidak ditemukan. Pastikan kode yang Anda masukkan benar.
+            </div>
+        @endif
+    </div>
+
+    <!-- 🧾 Grid Daftar Aduan -->
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($aduan as $item)
         <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-5">
@@ -27,11 +53,11 @@
                     <strong>{{ $item->nama }}</strong><br>
                     {{ Str::limit($item->aduan, 100) }}
                 </p>
-<a href="{{ route('aduan.show', ['token' => rawurlencode(\Illuminate\Support\Facades\Crypt::encryptString($item->kode_aduan))]) }}"
-   class="text-blue-600 font-medium hover:underline">
-    Baca Selengkapnya →
-</a>
 
+                <a href="{{ route('aduan.show', ['token' => rawurlencode(\Illuminate\Support\Facades\Crypt::encryptString($item->kode_aduan))]) }}"
+                   class="text-blue-600 font-medium hover:underline">
+                    Baca Selengkapnya →
+                </a>
             </div>
         </div>
         @empty
@@ -40,17 +66,11 @@
     </div>
 </section>
 
-    <!-- PAGINATION -->
+<!-- PAGINATION -->
 <div class="mt-10 flex flex-col items-center">
-    <!-- Pagination -->
     <div class="mb-2">
         {{ $aduan->links('pagination::tailwind') }}
     </div>
-
-
-
-
 </div>
-</section>
 
 <x-footer></x-footer>

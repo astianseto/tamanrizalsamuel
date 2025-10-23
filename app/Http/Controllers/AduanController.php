@@ -74,16 +74,18 @@ $validated = $request->validate([
         return redirect()->back()->with('success', "Laporan berhasil dikirim! Kode Aduan Anda: $kode_aduan");
     }
 
-    public function show($kode_aduan)
-    {
-        // Ambil aduan berdasarkan kode_aduan, beserta status terakhir dari tabel detail_aduan
-        $aduan = Aduan::where('kode_aduan', $kode_aduan)
-            ->with('latestDetail') // relasi ke status terbaru
-            ->firstOrFail();
-
-        return view('detail_aduan', compact('aduan'));
+public function show($token)
+{
+    try {
+        $kode = \Illuminate\Support\Facades\Crypt::decryptString($token);
+    } catch (\Exception $e) {
+        abort(404); // kalau token tidak valid
     }
 
+    $aduan = \App\Models\Aduan::where('kode_aduan', $kode)->firstOrFail();
+
+    return view('detail_aduan', compact('aduan'));
+}
  
 
 public function showEncrypted($token)
@@ -97,4 +99,22 @@ public function showEncrypted($token)
     $aduan = Aduan::where('kode_aduan', $kode)->firstOrFail();
     return view('detail_aduan', compact('aduan'));
 }
+
+public function cari(Request $request)
+{
+    $kode = trim($request->kode_aduan);
+
+    // Cari aduan berdasarkan kode_aduan
+    $aduan = \App\Models\Aduan::where('kode_aduan', $kode)->first();
+
+    if ($aduan) {
+        // Redirect langsung ke halaman detail
+        $encrypted = Crypt::encryptString($aduan->kode_aduan);
+        return redirect()->route('aduan.show', ['token' => $encrypted]);
+    }
+
+    // Jika tidak ditemukan, kembali ke daftar aduan dengan pesan
+    return redirect()->route('aduan.index')->with('not_found', true);
+}
+
 }
