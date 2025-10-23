@@ -17,6 +17,7 @@ return new class extends Migration
         $table->string('nik', 20);
         $table->string('nama', 100);
         $table->string('telfon', 20);
+        $table->string('alamat', 20);
         $table->text('aduan');
         $table->string('file')->nullable(); // bisa null jika tidak ada file
         $table->timestamps(); // untuk created_at dan updated_at
