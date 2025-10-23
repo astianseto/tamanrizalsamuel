@@ -3,7 +3,7 @@
 <!-- Main Section -->
   <main class="py-12">
     <div class="text-center mb-10">
-    <h2 class="text-3xl font-bold text-center text-blue-700 mb-2">Sampaikan Laporan Anda  </h2>
+    <h2 class="text-3xl font-bold text-center text-blue-700 mb-2">Tampa Mpangadu Rizal Samuel</h2>
       <p class="text-gray-500 mt-2">Pilih kanal pengaduan sesuai kebutuhan Anda</p>
     </div>
 

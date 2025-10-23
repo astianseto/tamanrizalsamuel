@@ -7,11 +7,11 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Sigmunds_Schwert_%281889%29_by_Johannes_Gehrts.jpg/250px-Sigmunds_Schwert_%281889%29_by_Johannes_Gehrts.jpg" alt="Logo" class="w-10 h-10 mr-3 rounded-md">
         <h2 class="text-lg font-bold">Taman Rizal Samuel</h2>
       </div>
-      <p class="font-semibold">Kabupaten Sigi</p>
+      <p class="font-semibold">Pemerintah Kabupaten Sigi</p>
       <p class="mt-2 leading-relaxed">
         Jl. Poros Palu–Kulawi, Sigi Kota, Sulawesi Tengah 94364
       </p>
-      <a href="#" class="text-blue-500 hover:underline block mt-2">
+      <a href="https://maps.app.goo.gl/kRFxMRWWeXBnKy5m6" class="text-blue-500 hover:underline block mt-2">
         Lihat Lokasi Google Maps
       </a>
     </div>
