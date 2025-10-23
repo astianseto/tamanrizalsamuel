@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Aduan;
 use App\Models\DetailAduan;
+use Illuminate\Support\Facades\Crypt;
 
 class AduanController extends Controller
 {
@@ -82,4 +83,18 @@ $validated = $request->validate([
 
         return view('detail_aduan', compact('aduan'));
     }
+
+ 
+
+public function showEncrypted($token)
+{
+    try {
+        $kode = Crypt::decryptString(rawurldecode($token));
+    } catch (\Throwable $e) {
+        abort(404);
+    }
+
+    $aduan = Aduan::where('kode_aduan', $kode)->firstOrFail();
+    return view('detail_aduan', compact('aduan'));
+}
 }

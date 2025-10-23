@@ -23,5 +23,6 @@ Route::get('/detail_aduan', function () {
 Route::get('/aduan', [AduanController::class, 'index'])->name('aduan.index');
 Route::get('/aduan/tambah', [AduanController::class, 'create'])->name('aduan.create');
 Route::post('/aduan', [AduanController::class, 'store'])->name('aduan.store');
-Route::get('/aduan/{kode_aduan}', [AduanController::class, 'show'])->name('aduan.show');
+// Route::get('/aduan/{kode_aduan}', [AduanController::class, 'show'])->name('aduan.show');
 
+Route::get('/aduan/{token}', [AduanController::class, 'showEncrypted'])->name('aduan.show');

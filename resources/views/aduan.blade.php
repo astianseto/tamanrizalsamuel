@@ -27,9 +27,11 @@
                     <strong>{{ $item->nama }}</strong><br>
                     {{ Str::limit($item->aduan, 100) }}
                 </p>
-                <a href="{{ route('aduan.show', $item->kode_aduan) }}" class="text-blue-600 font-medium hover:underline">
-                    Baca Selengkapnya →
-                </a>
+<a href="{{ route('aduan.show', ['token' => rawurlencode(\Illuminate\Support\Facades\Crypt::encryptString($item->kode_aduan))]) }}"
+   class="text-blue-600 font-medium hover:underline">
+    Baca Selengkapnya →
+</a>
+
             </div>
         </div>
         @empty
@@ -39,9 +41,16 @@
 </section>
 
     <!-- PAGINATION -->
-    <div class="mt-10 flex justify-center">
+<div class="mt-10 flex flex-col items-center">
+    <!-- Pagination -->
+    <div class="mb-2">
         {{ $aduan->links('pagination::tailwind') }}
     </div>
+
+
+
+
+</div>
 </section>
 
 <x-footer></x-footer>
