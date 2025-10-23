@@ -4,7 +4,7 @@
     <!-- Kolom 1 -->
     <div class="flex-1 md:ml-20">
       <div class="flex items-center mb-4">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Sigmunds_Schwert_%281889%29_by_Johannes_Gehrts.jpg/250px-Sigmunds_Schwert_%281889%29_by_Johannes_Gehrts.jpg" alt="Logo" class="w-10 h-10 mr-3 rounded-md">
+        <img src="Logo.png" alt="Logo" class="w-10 h-10 mr-3 rounded-md">
         <h2 class="text-lg font-bold">Taman Rizal Samuel</h2>
       </div>
       <p class="font-semibold">Pemerintah Kabupaten Sigi</p>
