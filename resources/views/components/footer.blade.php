@@ -4,7 +4,7 @@
     <!-- Kolom 1 -->
     <div class="flex-1 md:ml-20">
       <div class="flex items-center mb-4">
-        <img src="Logo.png" alt="Logo" class="w-10 h-10 mr-3 rounded-md">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-10 h-10 mr-3 rounded-md">
         <h2 class="text-lg font-bold">Taman Rizal Samuel</h2>
       </div>
       <p class="font-semibold">Pemerintah Kabupaten Sigi</p>
