@@ -10,6 +10,9 @@ class Aduan extends Model
     use HasFactory;
 
     protected $table = 'aduan';
+    protected $primaryKey = 'kode_aduan';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'kode_aduan',

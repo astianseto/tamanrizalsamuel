@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AduanController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,3 +47,16 @@ Route::get('/detail_aduan', function () {
 
 // ✅ Auth routes dari Breeze
 require __DIR__.'/auth.php';
+
+// ✅ Rute untuk halaman dashboard admin
+
+Route::middleware(['auth'])->group(function () {
+    
+Route::get('/dashboard', [AdminController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+    Route::get('/admin/{kode_aduan}/edit', [AduanController::class, 'edit'])->name('admin.edit');
+    Route::put('/admin/{kode_aduan}', [AduanController::class, 'update'])->name('admin.update');
+    Route::delete('/admin/{kode_aduan}', [AduanController::class, 'destroy'])->name('admin.destroy');
+});
+

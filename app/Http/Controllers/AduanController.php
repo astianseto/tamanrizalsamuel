@@ -127,4 +127,24 @@ public function cari(Request $request)
     return redirect()->route('aduan.index')->with('not_found', true);
 }
 
+public function edit($kode_aduan)
+{
+    $aduan = Aduan::where('kode_aduan', $kode_aduan)->firstOrFail();
+    return view('admin.edit', compact('aduan'));
+}
+
+public function update(Request $request, $kode_aduan)
+{
+    $aduan = Aduan::where('kode_aduan', $kode_aduan)->firstOrFail();
+    $aduan->update($request->all());
+    return redirect()->route('dashboard')->with('success', 'Data aduan berhasil diperbarui.');
+}
+
+public function destroy($kode_aduan)
+{
+    $aduan = Aduan::where('kode_aduan', $kode_aduan)->firstOrFail();
+    $aduan->delete();
+    return redirect()->route('dashboard')->with('success', 'Data aduan berhasil dihapus.');
+}
+
 }
