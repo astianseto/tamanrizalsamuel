@@ -35,4 +35,47 @@
     </div>
   </main>
 
+  @if (session('success'))
+    <div id="popupSuccess"
+        class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 opacity-0 scale-90 transition-all duration-300">
+        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center transform transition-all duration-300">
+            <div class="text-5xl text-blue-500 mb-3 animate-bounce">✅</div>
+            <h3 class="text-2xl font-semibold text-blue-600 mb-2">Berhasil!</h3>
+           <p class="text-gray-700 mb-5">{!! session('success') !!}</p>
+
+            <button id="closePopup"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const popup = document.getElementById('popupSuccess');
+            if (popup) {
+                setTimeout(() => {
+                    popup.classList.remove('opacity-0', 'scale-90');
+                    popup.classList.add('opacity-100', 'scale-100');
+                }, 100);
+
+                const closeBtn = document.getElementById('closePopup');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        popup.classList.add('opacity-0', 'scale-90');
+                        setTimeout(() => popup.remove(), 300);
+                    });
+                }
+
+                // Auto close setelah 3 detik
+                setTimeout(() => {
+                    popup.classList.add('opacity-0', 'scale-90');
+                    setTimeout(() => popup.remove(), 300);
+                }, 100000);
+            }
+        });
+    </script>
+@endif
+
+
 <x-footer></x-footer>

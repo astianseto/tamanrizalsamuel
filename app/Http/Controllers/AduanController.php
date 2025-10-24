@@ -23,13 +23,22 @@ class AduanController extends Controller
     public function store(Request $request)
     {
 $validated = $request->validate([
-            'nik' => 'required|string|max:20',
+            'nik' => 'required|digits:16',
             'nama' => 'required|string|max:100',
             'alamat' => 'required|string|max:255',
-            'telfon' => 'required|string|max:20',
-            'aduan' => 'required|string',
+            'telfon' => 'required|numeric|digits_between:12,14',
+            'aduan' => 'required|string|min:20',
             'file' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        ]
+        , [
+    'nik.required' => 'NIK wajib diisi.',
+    'nik.digits' => 'NIK tidak valid',
+    'telfon.digits' => 'Nomor telepon tidak valid',
+    'aduan.min' => 'Aduan terlalu singkat.',
+
+]);
+
+
 
         // ✅ Generate kode_aduan unik
         $tanggal = now()->format('Ymd');
@@ -71,7 +80,8 @@ $validated = $request->validate([
         ]);
 
 
-        return redirect()->back()->with('success', "Laporan berhasil dikirim! Kode Aduan Anda: $kode_aduan");
+       return redirect('/')->with('success', 'Aduan berhasil dikirim! Nomor Aduan Anda: ' . $kode_aduan);
+
     }
 
 public function show($token)

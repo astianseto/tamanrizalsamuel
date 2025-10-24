@@ -5,7 +5,7 @@
   <p class="text-center text-gray-500 mb-8">Isi form sesuai data Anda dengan benar</p>
 
   {{-- ✅ Form harus pakai method POST dan enctype multipart --}}
-  <form action="{{ route('aduan.store') }}" method="POST" enctype="multipart/form-data" 
+  <form action="{{ route('aduan.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off" 
         class="bg-white shadow-lg rounded-2xl p-8 space-y-5 border border-gray-100">
 
     @csrf
@@ -15,7 +15,9 @@
       <label for="nik" class="block font-semibold mb-1">NIK <span class="text-red-500">*</span></label>
       <input type="text" id="nik" name="nik" value="{{ old('nik') }}" placeholder="Masukkan NIK Anda" required
         class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-      @error('nik') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
+      @error('nik')
+  <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+@enderror
     </div>
 
     <!-- Nama -->
@@ -77,6 +79,11 @@
       </div>
     @endif
   </form>
+
+  
+
 </main>
+
+
 
 <x-footer></x-footer>
