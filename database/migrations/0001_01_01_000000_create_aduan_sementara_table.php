@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('aduan_sementara', function (Blueprint $table) {
-
-        $table->string('kode_aduan')->unique();
-        $table->string('nik', 20);
-        $table->string('nama', 100);
-        $table->string('telfon', 20);
-        $table->text('aduan');
-        $table->string('file')->nullable(); // bisa null jika tidak ada file
-        $table->timestamps(); // untuk created_at dan updated_at
+            $table->string('kode_aduan', 255)->primary(); // ✅ primary key
+            $table->string('nik', 20)->index(); // ✅ index
+            $table->string('nama', 100);
+            $table->string('alamat', 255); // ✅ ubah jadi 255
+            $table->string('telfon', 20);
+            $table->text('aduan');
+            $table->string('file', 255)->nullable();
+            $table->timestamps(); // ✅ created_at & updated_at
         
         });
 
