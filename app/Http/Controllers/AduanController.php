@@ -42,15 +42,26 @@ class AduanController extends Controller
         ]);
 
         // Ambil kode terakhir dari tabel aduan
-        $lastAduan = Aduan::orderBy('kode_aduan', 'desc')->first();
-        $lastNumber = 0;
+        // Ambil kode terakhir dari kedua tabel
+$lastAduan = Aduan::orderBy('kode_aduan', 'desc')->first();
+$lastTemp  = AduanTemp::orderBy('kode_aduan', 'desc')->first();
 
-        if ($lastAduan && preg_match('/LSR-(\d+)/', $lastAduan->kode_aduan, $matches)) {
-            $lastNumber = (int)$matches[1];
-        }
+$lastNumberAduan = 0;
+$lastNumberTemp  = 0;
 
-        $newNumber = $lastNumber + 1;
-        $newKode = 'LSR-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+// Ambil nomor dari Aduan
+if ($lastAduan && preg_match('/LSR-(\d+)/', $lastAduan->kode_aduan, $matches)) {
+    $lastNumberAduan = (int)$matches[1];
+}
+
+// Ambil nomor dari AduanTemp
+if ($lastTemp && preg_match('/LSR-(\d+)/', $lastTemp->kode_aduan, $matches)) {
+    $lastNumberTemp = (int)$matches[1];
+}
+
+// Gunakan nomor terbesar + 1
+$newNumber = max($lastNumberAduan, $lastNumberTemp) + 1;
+$newKode = 'LSR-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
         // Upload file jika ada
         $path = $request->hasFile('file') ? $request->file('file')->store('aduan', 'public') : null;

@@ -76,7 +76,12 @@
                     <tbody>
                         @forelse ($aduan as $item)
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 border-b font-medium text-gray-800">{{ $item->kode_aduan }}</td>
+                                <td class="px-4 py-3 border-b font-medium text-gray-800">
+    <a href="{{ route('aduan.show', ['token' => Crypt::encryptString($item->kode_aduan)]) }}"
+       class="text-blue-600 hover:underline">
+        {{ $item->kode_aduan }}
+    </a>
+</td>
                                 <td class="px-4 py-3 border-b">{{ $item->nama }}</td>
                                 <td class="px-4 py-3 border-b">{{ Str::limit($item->aduan, 50) }}</td>
                                 <td class="px-4 py-3 border-b text-center">
