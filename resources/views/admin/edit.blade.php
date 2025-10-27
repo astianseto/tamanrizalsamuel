@@ -1,11 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            </h2>
-            <a href="{{ route('dashboard') }}" 
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">✏️ Jawab Aduan</h2>
+            <a href="{{ route('admin.aduan') }}" 
                class="text-sm text-blue-600 hover:underline">
-                ← Kembali ke Dashboard
+                ← Kembali ke Daftar Aduan
             </a>
         </div>
     </x-slot>
@@ -13,67 +12,58 @@
     <div class="py-8 max-w-4xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white shadow-sm border border-gray-100 rounded-2xl p-8">
             
-            {{-- Judul --}}
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">✏️ Jawab Aduan</h1>
-                <p class="text-gray-500 text-sm mt-1">
-                    Jawab aduan pengguna di bawah ini.
-                </p>
-            </div>
-
-            {{-- Formulir Edit --}}
+            {{-- Formulir Jawaban --}}
             <form method="POST" action="{{ route('admin.update', $aduan->kode_aduan) }}" class="space-y-6">
                 @csrf
                 @method('PUT')
 
+                {{-- Kode Aduan --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Aduan</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kode Aduan</label>
                     <input type="text" 
-                           name="nama"  
                            value="{{ $aduan->kode_aduan }}" 
-                           class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring focus:ring-blue-200 focus:outline-none bg-gray-100 cursor-not-allowed"
-                           readonly
-                           tabindex="-1"
-                           disabled>
+                           class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-gray-100 cursor-not-allowed"
+                           readonly>
                 </div>
 
-
+                {{-- Nama --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
                     <input type="text" 
-                           name="nama" 
                            value="{{ $aduan->nama }}" 
-                           class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring focus:ring-blue-200 focus:outline-none bg-gray-100 cursor-not-allowed"
-                           readonly
-                           tabindex="-1"
-                           disabled>
+                           class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-gray-100 cursor-not-allowed"
+                           readonly>
                 </div>
 
+                {{-- Isi Aduan --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Aduan</label>
-                    <textarea name="aduan" 
-                              rows="4"
-                              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring focus:ring-blue-200 focus:outline-none bg-gray-100 cursor-not-allowed"
-                              readonly
-                              tabindex="-1"
-                              disabled>{{ $aduan->aduan }}</textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Isi Aduan</label>
+                    <textarea rows="4"
+                              class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-gray-100 cursor-not-allowed"
+                              readonly>{{ $aduan->aduan }}</textarea>
                 </div>
 
-                {{-- Status (opsional jika ada kolom status di tabel) --}}
-                @if(isset($aduan->status))
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select name="status" 
-                                class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring focus:ring-blue-200 focus:outline-none">
-                            <option value="Proses" {{ $aduan->status == 'Proses' ? 'selected' : '' }}>Proses</option>
-                            <option value="Selesai" {{ $aduan->status == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                        </select>
-                    </div>
-                @endif
+                {{-- Jawaban --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawaban</label>
+                    <textarea name="jawaban" rows="4"
+                              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring focus:ring-blue-200 focus:outline-none"
+                              placeholder="Tulis jawaban untuk aduan ini...">{{ $aduan->detailAduan->jawaban ?? '' }}</textarea>
+                </div>
+
+                {{-- Status --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" 
+                            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring focus:ring-blue-200 focus:outline-none">
+                        <option value="Proses" {{ ($aduan->detailAduan->status ?? '') == 'Proses' ? 'selected' : '' }}>Proses</option>
+                        <option value="Selesai" {{ ($aduan->detailAduan->status ?? '') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                    </select>
+                </div>
 
                 {{-- Tombol Aksi --}}
                 <div class="flex justify-end space-x-3 pt-4">
-                    <a href="{{ route('dashboard') }}" 
+                    <a href="{{ route('admin.aduan') }}" 
                        class="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition">
                         Batal
                     </a>

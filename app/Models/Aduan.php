@@ -15,27 +15,16 @@ class Aduan extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'kode_aduan',
-        'nik',
-        'nama',
-        'alamat',
-        'telfon',
-        'aduan',
-        'file',
+        'kode_aduan', 'nik', 'nama', 'alamat', 'telfon', 'aduan', 'file', 'kode_gambar'
     ];
-    public function detail()
-    {
-        return $this->hasMany(DetailAduan::class, 'kode_aduan', 'kode_aduan');
-    }
 
-    /**
-     * Relasi ke status terakhir (yang paling baru)
-     */
-    public function latestDetail()
+    // ============================================================
+    // 🔹 RELASI KE DETAIL ADUAN
+    // ============================================================
+    public function detailAduan()
     {
-        return $this->hasOne(DetailAduan::class, 'kode_aduan', 'kode_aduan')->latestOfMany();
+        return $this->hasOne(DetailAduan::class, 'kode_aduan', 'kode_aduan', 'jawaban');
+        // jika satu aduan punya beberapa jawaban, gunakan hasMany
+        // return $this->hasMany(DetailAduan::class, 'kode_aduan', 'kode_aduan');
     }
-    
 }
-
-
