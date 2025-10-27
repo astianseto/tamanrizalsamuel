@@ -14,10 +14,11 @@ class DetailAduan extends Model
     protected $fillable = [
         'kode_aduan',
         'status',
+        'jawaban',
     ];
 
     public function aduan()
     {
-        return $this->belongsTo(Aduan::class, 'kode_aduan', 'kode_aduan');
+        return $this->belongsTo(Aduan::class, 'kode_aduan', 'kode_aduan','jawaban');
     }
 }

@@ -11,20 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-      
-        Schema::create('detail_aduan', function (Blueprint $table) {
-
+        Schema::create('aduan_temps', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_aduan')->constrained('aduan')->onDelete('cascade');
-            $table->string('status', 50);
-            $table->string('jawaban', 255);
             $table->timestamps();
         });
-
-    
-
-
-       
     }
 
     /**
@@ -32,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        
-        Schema::dropIfExists('detailaduan');
-
+        Schema::dropIfExists('aduan_temps');
     }
 };

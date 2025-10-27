@@ -50,31 +50,44 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const popup = document.getElementById('popupSuccess');
-            if (popup) {
-                setTimeout(() => {
-                    popup.classList.remove('opacity-0', 'scale-90');
-                    popup.classList.add('opacity-100', 'scale-100');
-                }, 100);
+<div id="popupSuccess" 
+     data-kode="{{ $newKode ?? 'aduan' }}" 
+     class="fixed bottom-5 right-5 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg transform scale-90 opacity-0 transition-all duration-300">
+    ✅ Aduan berhasil disimpan!
+</div>
 
-                const closeBtn = document.getElementById('closePopup');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => {
-                        popup.classList.add('opacity-0', 'scale-90');
-                        setTimeout(() => popup.remove(), 300);
-                    });
-                }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById('popupSuccess');
 
-                // Auto close setelah 3 detik
-                setTimeout(() => {
-                    popup.classList.add('opacity-0', 'scale-90');
-                    setTimeout(() => popup.remove(), 300);
-                }, 100000);
-            }
-        });
-    </script>
+    if (popup) {
+        const kode = popup.dataset.kode || 'aduan';
+
+        // Tampilkan popup
+        setTimeout(() => {
+            popup.classList.remove('opacity-0', 'scale-90');
+            popup.classList.add('opacity-100', 'scale-100');
+
+            // Ambil snapshot popup dan download otomatis
+            html2canvas(popup).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${kode}.png`; // Nama file sesuai kode_aduan
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }, 100);
+
+        // Tutup popup otomatis setelah 3 detik
+        setTimeout(() => {
+            popup.classList.add('opacity-0', 'scale-90');
+            setTimeout(() => popup.remove(), 300);
+        }, 3000);
+    }
+});
+</script>
+
+
 @endif
 
 

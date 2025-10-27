@@ -2,149 +2,190 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\AduanTemp;
 use App\Models\Aduan;
 use App\Models\DetailAduan;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
 class AduanController extends Controller
 {
+    /* ============================================================
+     * 🏠 INDEX — Menampilkan daftar aduan dari tabel utama
+     * ============================================================ */
     public function index()
     {
         $aduan = Aduan::latest()->paginate(6);
         return view('aduan', compact('aduan'));
     }
 
+    /* ============================================================
+     * ➕ CREATE — Form input aduan baru
+     * ============================================================ */
     public function create()
     {
         return view('form_aduan');
     }
 
+    /* ============================================================
+     * 💾 STORE — Simpan aduan baru ke tabel sementara
+     * ============================================================ */
     public function store(Request $request)
     {
-$validated = $request->validate([
-            'nik' => 'required|digits:16',
-            'nama' => 'required|string|max:100',
-            'alamat' => 'required|string|max:255',
-            'telfon' => 'required|numeric|digits_between:12,14',
-            'aduan' => 'required|string|min:20',
-            'file' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]
-        , [
-    'nik.required' => 'NIK wajib diisi.',
-    'nik.digits' => 'NIK tidak valid',
-    'telfon.digits' => 'Nomor telepon tidak valid',
-    'aduan.min' => 'Aduan terlalu singkat.',
+        $request->validate([
+            'nik' => 'required',
+            'nama' => 'required',
+            'alamat' => 'required',
+            'telfon' => 'required',
+            'aduan' => 'required',
+            'file' => 'nullable|image|max:2048',
+        ]);
 
-]);
+        // Ambil kode terakhir dari tabel aduan
+        // Ambil kode terakhir dari kedua tabel
+$lastAduan = Aduan::orderBy('kode_aduan', 'desc')->first();
+$lastTemp  = AduanTemp::orderBy('kode_aduan', 'desc')->first();
 
+$lastNumberAduan = 0;
+$lastNumberTemp  = 0;
 
+// Ambil nomor dari Aduan
+if ($lastAduan && preg_match('/LSR-(\d+)/', $lastAduan->kode_aduan, $matches)) {
+    $lastNumberAduan = (int)$matches[1];
+}
 
-        // ✅ Generate kode_aduan unik
-        $tanggal = now()->format('Ymd');
-        $prefix = 'LSR' . $tanggal . '-';
+// Ambil nomor dari AduanTemp
+if ($lastTemp && preg_match('/LSR-(\d+)/', $lastTemp->kode_aduan, $matches)) {
+    $lastNumberTemp = (int)$matches[1];
+}
 
-        $lastAduan = Aduan::where('kode_aduan', 'like', $prefix . '%')
-            ->orderBy('kode_aduan', 'desc')
-            ->first();
+// Gunakan nomor terbesar + 1
+$newNumber = max($lastNumberAduan, $lastNumberTemp) + 1;
+$newKode = 'LSR-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
-        if ($lastAduan) {
-            $lastNumber = (int) substr($lastAduan->kode_aduan, -3);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
-        }
+        // Upload file jika ada
+        $path = $request->hasFile('file') ? $request->file('file')->store('aduan', 'public') : null;
 
-        $kode_aduan = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-
-        // ✅ Upload file jika ada
-        $path = null;
-        if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('aduan', 'public');
-        }
-
-        // ✅ Simpan ke database
-        Aduan::create([
-            'kode_aduan' => $kode_aduan,
-            'nik' => $validated['nik'],
-            'nama' => $validated['nama'],
-            'alamat' => $validated['alamat'],
-            'telfon' => $validated['telfon'],
-            'aduan' => $validated['aduan'],
+        // Simpan ke tabel sementara
+        AduanTemp::create([
+            'kode_aduan' => $newKode,
+            'nik' => $request->nik,
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'telfon' => $request->telfon,
+            'aduan' => $request->aduan,
             'file' => $path,
         ]);
-        
-        DetailAduan::create([
-            'kode_aduan' => $kode_aduan,
-            'status' => 'sedang ditinjau',
-        ]);
 
-
-       return redirect('/')->with('success', 'Aduan berhasil dikirim! Nomor Aduan Anda: ' . $kode_aduan);
-
+        return redirect('/')
+            ->with('success', 'Aduan berhasil dikirim! Nomor Aduan Anda: ' . $newKode);
     }
 
-public function show($token)
-{
-    try {
-        $kode = \Illuminate\Support\Facades\Crypt::decryptString($token);
-    } catch (\Exception $e) {
-        abort(404); // kalau token tidak valid
+    /* ============================================================
+     * 🔍 SHOW — Tampilkan detail aduan dari kedua tabel
+     * ============================================================ */
+    public function show($token)
+    {
+        try {
+            $kode = Crypt::decryptString($token);
+        } catch (\Exception $e) {
+            abort(404); // Token tidak valid
+        }
+
+        // Cari di tabel utama
+        $aduan = Aduan::with('detailAduan')->where('kode_aduan', $kode)->first();
+
+        // Jika tidak ada, cari di tabel sementara
+        if (!$aduan) {
+            $aduan = AduanTemp::with('detailAduan')->where('kode_aduan', $kode)->first();
+        }
+
+        if (!$aduan) {
+            abort(404);
+        }
+
+        return view('detail_aduan', compact('aduan'));
     }
 
-    $aduan = \App\Models\Aduan::where('kode_aduan', $kode)->firstOrFail();
+    /* ============================================================
+     * 🧩 SHOW ENCRYPTED — Versi lain untuk URL encoded
+     * ============================================================ */
+    public function showEncrypted($token)
+    {
+        try {
+            $kode = Crypt::decryptString(rawurldecode($token));
+        } catch (\Throwable $e) {
+            abort(404);
+        }
 
-    return view('detail_aduan', compact('aduan'));
-}
- 
+        // Sama, cek kedua tabel
+        $aduan = Aduan::with('detailAduan')->where('kode_aduan', $kode)->first();
+        if (!$aduan) {
+            $aduan = AduanTemp::with('detailAduan')->where('kode_aduan', $kode)->first();
+        }
 
-public function showEncrypted($token)
-{
-    try {
-        $kode = Crypt::decryptString(rawurldecode($token));
-    } catch (\Throwable $e) {
-        abort(404);
+        if (!$aduan) {
+            abort(404);
+        }
+
+        return view('detail_aduan', compact('aduan'));
     }
 
-    $aduan = Aduan::where('kode_aduan', $kode)->firstOrFail();
-    return view('detail_aduan', compact('aduan'));
-}
+    /* ============================================================
+     * 🔎 CARI — Cari aduan berdasarkan kode_aduan di kedua tabel
+     * ============================================================ */
+    public function cari(Request $request)
+    {
+        $kode = trim($request->kode_aduan);
 
-public function cari(Request $request)
-{
-    $kode = trim($request->kode_aduan);
+        $aduan = Aduan::with('detailAduan')->where('kode_aduan', $kode)->first();
+        if (!$aduan) {
+            $aduan = AduanTemp::with('detailAduan')->where('kode_aduan', $kode)->first();
+        }
 
-    // Cari aduan berdasarkan kode_aduan
-    $aduan = \App\Models\Aduan::where('kode_aduan', $kode)->first();
+        if (!$aduan) {
+            return redirect()->route('aduan.index')->with('not_found', true);
+        }
 
-    if ($aduan) {
-        // Redirect langsung ke halaman detail
         $encrypted = Crypt::encryptString($aduan->kode_aduan);
         return redirect()->route('aduan.show', ['token' => $encrypted]);
     }
 
-    // Jika tidak ditemukan, kembali ke daftar aduan dengan pesan
-    return redirect()->route('aduan.index')->with('not_found', true);
-}
+    /* ============================================================
+     * ✏️ EDIT & UPDATE — Admin edit jawaban aduan
+     * ============================================================ */
+    public function edit($kode_aduan)
+    {
+        $aduan = Aduan::with('detailAduan')->where('kode_aduan', $kode_aduan)->firstOrFail();
+        return view('admin.edit', compact('aduan'));
+    }
 
-public function edit($kode_aduan)
-{
-    $aduan = Aduan::where('kode_aduan', $kode_aduan)->firstOrFail();
-    return view('admin.edit', compact('aduan'));
-}
+    public function update(Request $request, $kode_aduan)
+    {
+        $request->validate([
+            'jawaban' => 'required|string',
+            'status' => 'required|string',
+        ]);
 
-public function update(Request $request, $kode_aduan)
-{
-    $aduan = Aduan::where('kode_aduan', $kode_aduan)->firstOrFail();
-    $aduan->update($request->all());
-    return redirect()->route('dashboard')->with('success', 'Data aduan berhasil diperbarui.');
-}
+        DetailAduan::updateOrCreate(
+            ['kode_aduan' => $kode_aduan],
+            [
+                'jawaban' => $request->jawaban,
+                'status' => $request->status,
+            ]
+        );
 
-public function destroy($kode_aduan)
-{
-    $aduan = Aduan::where('kode_aduan', $kode_aduan)->firstOrFail();
-    $aduan->delete();
-    return redirect()->route('dashboard')->with('success', 'Data aduan berhasil dihapus.');
-}
+        return redirect()->route('admin.aduan')->with('success', 'Jawaban berhasil disimpan!');
+    }
 
+    /* ============================================================
+     * 🗑️ DESTROY — Hapus aduan sementara
+     * ============================================================ */
+    public function destroy($kode_aduan)
+    {
+        $aduan = AduanTemp::where('kode_aduan', $kode_aduan)->firstOrFail();
+        $aduan->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Data aduan berhasil dihapus.');
+    }
 }
