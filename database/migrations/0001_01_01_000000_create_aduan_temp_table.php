@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aduan_sementara', function (Blueprint $table) {
+        Schema::create('aduan_temp', function (Blueprint $table) {
             $table->string('kode_aduan', 255)->primary(); // ✅ primary key
-            $table->string('nik', 20)->index(); // ✅ index
+            $table->string('nik', 20); // ✅ index
             $table->string('nama', 100);
             $table->string('alamat', 255); // ✅ ubah jadi 255
             $table->string('telfon', 20);
