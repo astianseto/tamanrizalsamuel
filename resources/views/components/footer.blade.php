@@ -53,6 +53,7 @@
       <ul class="space-y-1">
         <li><a href="/" class="hover:text-blue-600">Home</a></li>
         <li><a href="aduan" class="hover:text-blue-600">Daftar Aduan</a></li>
+        <li><a href="about" class="hover:text-blue-600">Tantang Kami</a></li>
         <li><a href="https://sigikab.go.id" class="hover:text-blue-600">Website SigiKab</a></li>
       </ul>
     </div>
