@@ -68,9 +68,9 @@ Route::get('/admin/export/unanswered', [AdminController::class, 'exportUnanswere
 
     Route::get('/aduan/{token}', [AduanController::class, 'showEncrypted'])->name('aduan.show');
 
-//     Route::get('/register', function() {
-//     return redirect('/login');
-// });
-// Route::post('/register', function() {
-//     return redirect('/login');
-// });
+    Route::get('/register', function() {
+    return redirect('/login');
+});
+Route::post('/register', function() {
+    return redirect('/login');
+});
